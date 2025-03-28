@@ -18,7 +18,6 @@ import { RootState } from "./types";
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const GenAIAnalyticsDashboard = () => {
-
   const { question, searchHistory } = useSelector(
     (state: RootState) => state.dashboard
   );
@@ -33,7 +32,6 @@ const GenAIAnalyticsDashboard = () => {
     dispatch(setIsLoading(true));
 
     try {
-
       // Generate natural language insights
       const responsePrompt = `Provide a short 200 words professional analysis with spaces for the question: ${queryToUse}`;
       const responseResult = await model.generateContent(responsePrompt);
@@ -137,7 +135,7 @@ const GenAIAnalyticsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800">
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">

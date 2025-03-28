@@ -4,9 +4,9 @@ const initialState = {
   question: "",
   output: "",
   aiRecommendations: [
-    "Sales performance by region",
+    "Sales performance of Amazon in USA",
     "Top 10 products this quarter",
-    "Customer retention rates",
+    "Total Profit of IT companies since 2020",
   ] as string[],
   chartData: [],
   isLoading: false,
