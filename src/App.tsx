@@ -141,13 +141,14 @@ const GenAIAnalyticsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800">
+    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800">
+      {/* header */}
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <BarChart2 className="text-blue-600" size={32} />
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              AI Analytics Dashboard
+            <h1 className="text-xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+              Data Query Dashboard
             </h1>
           </div>
         </div>
@@ -167,6 +168,8 @@ const GenAIAnalyticsDashboard = () => {
           <ResultSection />
         </div>
       </main>
+
+      {/* footer */}
       <footer className="bg-white shadow py-4 bottom-0">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm text-gray-500">
