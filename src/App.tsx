@@ -27,7 +27,7 @@ const GenAIAnalyticsDashboard = () => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const handleGeminiQuery = async (queryOverride?: string) => {
-    const queryToUse = (queryOverride || question || "").trim();
+    const queryToUse = queryOverride || question || "";
     if (!queryToUse) return;
     dispatch(setIsLoading(true));
 
