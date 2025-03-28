@@ -27,20 +27,20 @@ const GenAIAnalyticsDashboard = () => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const handleGeminiQuery = async (queryOverride?: string) => {
-    const queryToUse = queryOverride || question;
-    if (!queryToUse.trim()) return;
+    const queryToUse = (queryOverride || question || "").trim();
+    if (!queryToUse) return;
     dispatch(setIsLoading(true));
 
     try {
       // Generate natural language insights
-      const responsePrompt = `Provide a short 200 words professional analysis with spaces for the question: ${queryToUse}`;
+      const responsePrompt = `Provide a short 130 words professional answer for the question: ${queryToUse}`;
       const responseResult = await model.generateContent(responsePrompt);
-      const textResponse = await responseResult.response.text();
+      const textResponse = responseResult.response.text();
 
       // Generate JSON data for chart (supporting year, months, or days)
       const jsonPrompt = `Create a JSON array of sales/performance data related to this question: ${queryToUse}. Provide an array of objects with a time period key (it can be 'year', 'months', or 'days') and a 'profit' key. Only return valid JSON. Example1: [{ "year": "2022", "profit": 4000 }, { "year": "2023", "profit": 4500 }] Example2: [{ "month": "jan", "profit": 4000 }, { "month": "feb", "profit": 4500 }]`;
       const jsonResult = await model.generateContent(jsonPrompt);
-      const jsonResponseText = await jsonResult.response.text();
+      const jsonResponseText = jsonResult.response.text();
       const parsedData = extractJSON(jsonResponseText);
       console.log(parsedData);
 
@@ -49,8 +49,7 @@ const GenAIAnalyticsDashboard = () => {
       const recommendationResult = await model.generateContent(
         recommendationPrompt
       );
-      const recommendationsResponseText =
-        await recommendationResult.response.text();
+      const recommendationsResponseText = recommendationResult.response.text();
       const suggestionsArray = extractSuggestions(recommendationsResponseText);
 
       // Update state
@@ -86,10 +85,10 @@ const GenAIAnalyticsDashboard = () => {
       if (!Array.isArray(parsedData) || parsedData.length === 0) {
         throw new Error("Invalid data format");
       }
-      // Normalize each object: map time period to a unified key "timePeriod"
+
       const normalizedData = parsedData.map((item) => {
         const keys = Object.keys(item);
-        // Find the key that is not "profit" (it could be "year", "months", or "days")
+
         const timeKey =
           keys.find((key) => key.toLowerCase() !== "profit") || "timePeriod";
         return {
@@ -116,13 +115,20 @@ const GenAIAnalyticsDashboard = () => {
       if (!Array.isArray(parsedSuggestions) || parsedSuggestions.length === 0) {
         throw new Error("Invalid suggestions format");
       }
-      return parsedSuggestions
-        .slice(0, 3)
-        .map((suggestion) =>
-          typeof suggestion === "string"
-            ? suggestion
-            : JSON.stringify(suggestion)
-        );
+      return parsedSuggestions.slice(0, 3).map((suggestion) => {
+        if (
+          typeof suggestion === "object" &&
+          (suggestion.question || suggestion.text)
+        ) {
+          return suggestion.question || suggestion.text;
+        }
+
+        if (typeof suggestion === "string") {
+          return suggestion;
+        }
+
+        return String(suggestion);
+      });
     } catch (error) {
       console.error("Suggestions parsing error:", error);
       return [];
