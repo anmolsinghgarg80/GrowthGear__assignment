@@ -4,7 +4,7 @@ import { setQuestion } from "../features/dashboardSlice";
 import { Search } from "lucide-react";
 
 type Props = {
-  handleGeminiQuery: () => void;
+  handleGeminiQuery: (question: string) => void;
 };
 
 const SearchSection = ({ handleGeminiQuery }: Props) => {
@@ -30,7 +30,7 @@ const SearchSection = ({ handleGeminiQuery }: Props) => {
           className="flex-grow border-2 border-blue-200 rounded-xl p-1 md:p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
         <button
-          onClick={handleGeminiQuery}
+          onClick={() => handleGeminiQuery(question)}
           disabled={isLoading}
           className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-2 py-2 rounded-xl md:px-4 md:py-2 md:rounded-r-xl  hover:opacity-90 transition-all disabled:opacity-50"
         >

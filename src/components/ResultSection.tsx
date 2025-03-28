@@ -45,11 +45,19 @@ const ResultSection = () => {
             Data Visualization
           </h2>
         </div>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={300} className="ml-5">
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis dataKey="timePeriod" stroke="#718096" />
-            <YAxis stroke="#718096" />
+            <YAxis
+              dataKey="profit"
+              stroke="#718096"
+              tickFormatter={(value) =>
+                value >= 1000000 || value < 1000000
+                  ? `${value / 1000000}M`
+                  : `${value}`
+              }
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: "#f0f4f8",

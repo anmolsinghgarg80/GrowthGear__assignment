@@ -14,6 +14,7 @@ import {
 import { BarChart2 } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { RootState } from "./types";
+import store from "./store/store";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -27,7 +28,12 @@ const GenAIAnalyticsDashboard = () => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const handleGeminiQuery = async (queryOverride?: string) => {
-    const queryToUse = queryOverride || question || "";
+    const state = store.getState();
+    const question = state.dashboard.question;
+
+    const queryToUse = String(queryOverride ?? question ?? "");
+    console.log("queryToUse:", queryToUse);
+
     if (!queryToUse) return;
     dispatch(setIsLoading(true));
 
@@ -57,6 +63,7 @@ const GenAIAnalyticsDashboard = () => {
       dispatch(setOutput(textResponse));
       dispatch(setChartData(parsedData));
       dispatch(setIsLoading(false));
+
       const updatedSearchHistory = [...searchHistory, queryToUse].slice(-5);
       dispatch(setSearchHistory(updatedSearchHistory));
     } catch (error) {
@@ -93,7 +100,7 @@ const GenAIAnalyticsDashboard = () => {
           keys.find((key) => key.toLowerCase() !== "profit") || "timePeriod";
         return {
           timePeriod: item[timeKey],
-          profit: item["profit"] || item["Profit"] || 0,
+          profit: item["profit"] || item["Profit"] || "0",
         };
       });
       return normalizedData;
@@ -156,7 +163,9 @@ const GenAIAnalyticsDashboard = () => {
 
       <main className="flex-grow max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <SearchSection handleGeminiQuery={handleGeminiQuery} />
+          <SearchSection
+            handleGeminiQuery={() => handleGeminiQuery(question)}
+          />
           <AiSuggestionSection
             handleRecommendationClick={handleRecommendationClick}
           />
