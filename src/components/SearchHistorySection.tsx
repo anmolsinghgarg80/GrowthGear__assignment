@@ -1,40 +1,38 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../types";
 
-type props = {
+type Props = {
   handleRecommendationClick: (history: string) => void;
 };
 
-const SearchHistorySection = ({ handleRecommendationClick }: props) => {
+const SearchHistorySection = ({ handleRecommendationClick }: Props) => {
   const { searchHistory } = useSelector((state: RootState) => state.dashboard);
 
   return (
-    <>
+    <div className="bg-white rounded-lg shadow p-4">
       {searchHistory.length > 0 ? (
-        <div className="mb-4 bg-[#1e293b] p-2 rounded-xl px-4">
-          <h3 className="text-lg font-semibold mb-2 text-blue-400">
-            Older History
+        <>
+          <h3 className="text-lg font-semibold text-blue-600 mb-2">
+            Search History
           </h3>
-          <div className="grid grid-cols-1">
+          <div className="grid grid-cols-1 gap-2">
             {searchHistory.map((history, index) => (
               <button
                 key={index}
                 onClick={() => handleRecommendationClick(history)}
-                className="bg-[#1e293b] px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-left break-words"
+                className="bg-gray-200 hover:bg-blue-100 text-gray-800 px-4 py-2 rounded-lg transition-colors text-left break-words"
               >
-                {index + 1}. {history}
+                # {history}
               </button>
             ))}
           </div>
-        </div>
+        </>
       ) : (
-        <div className="mb-4 bg-[#1e293b] p-2 rounded-xl px-4">
-          <h3 className="text-lg font-semibold mb-2 text-blue-400">
-            You have no Search history
-          </h3>
-        </div>
+        <h3 className="text-lg font-semibold text-blue-600">
+          No Search History
+        </h3>
       )}
-    </>
+    </div>
   );
 };
 

@@ -1,9 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useDispatch, useSelector } from "react-redux";
-import { ChartDataType, RootState } from "./types";
+import SearchSection from "./components/SearchSection";
 import AiSuggestionSection from "./components/AiSuggestionSection";
 import SearchHistorySection from "./components/SearchHistorySection";
-import SearchSection from "./components/SearchSection";
 import ResultSection from "./components/ResultSection";
 import {
   setQuestion,
@@ -13,6 +11,8 @@ import {
   setIsLoading,
   setSearchHistory,
 } from "./features/dashboardSlice";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { RootState } from "./types";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -20,33 +20,28 @@ const GenAIAnalyticsDashboard = () => {
   const { question, searchHistory } = useSelector(
     (state: RootState) => state.dashboard
   );
-
   const dispatch = useDispatch();
-
-  // Initialize Gemini AI
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  // Handle query submission with Gemini processing
   const handleGeminiQuery = async (queryOverride?: string) => {
     const queryToUse = queryOverride || question;
-
     if (!queryToUse.trim()) return;
     dispatch(setIsLoading(true));
-
     try {
       // Generate natural language insights
       const responsePrompt = `Provide a short 200 words professional analysis for the question: ${queryToUse}`;
       const responseResult = await model.generateContent(responsePrompt);
       const textResponse = await responseResult.response.text();
 
-      // Generate JSON data for chart
-      const jsonPrompt = `Create a JSON array of sales/performance data related to this question: ${queryToUse}. Provide an array of objects with 'year' and 'profit' keys. Only return valid JSON. Example: [{ "year": "2022", "profit": 4000 }, { "year": "2023", "profit": 4500 }]`;
+      // Generate JSON data for chart (supporting year, months, or days)
+      const jsonPrompt = `Create a JSON array of sales/performance data related to this question: ${queryToUse}. Provide an array of objects with a time period key (it can be 'year', 'months', or 'days') and a 'profit' key. Only return valid JSON. Example1: [{ "year": "2022", "profit": 4000 }, { "year": "2023", "profit": 4500 }] Example2: [{ "month": "jan", "profit": 4000 }, { "month": "feb", "profit": 4500 }]`;
       const jsonResult = await model.generateContent(jsonPrompt);
       const jsonResponseText = await jsonResult.response.text();
       const parsedData = extractJSON(jsonResponseText);
+      console.log(parsedData);
 
-      // Instruct Gemini to return a JSON array of suggestions
+      // Generate AI recommendations
       const recommendationPrompt = `Return a JSON array of three questions similar to: "${queryToUse}". Ensure the array contains complete, relevant questions.`;
       const recommendationResult = await model.generateContent(
         recommendationPrompt
@@ -55,20 +50,20 @@ const GenAIAnalyticsDashboard = () => {
         await recommendationResult.response.text();
       const suggestionsArray = extractSuggestions(recommendationsResponseText);
 
-      // Update state values
+      // Update state
       dispatch(setAiRecommendations(suggestionsArray));
       dispatch(setOutput(textResponse));
       dispatch(setChartData(parsedData));
       dispatch(setIsLoading(false));
-      const updatedSearchHistory = [...searchHistory, queryToUse].slice(-5); // Keep last 5 searches
+      const updatedSearchHistory = [...searchHistory, queryToUse].slice(-5);
       dispatch(setSearchHistory(updatedSearchHistory));
     } catch (error) {
       console.error("Error processing AI response:", error);
       dispatch(
         setChartData([
-          { year: "2022", profit: 500 },
-          { year: "2023", profit: 750 },
-          { year: "2024", profit: 1000 },
+          { timePeriod: "2022", profit: 500 },
+          { timePeriod: "2023", profit: 750 },
+          { timePeriod: "2024", profit: 1000 },
         ])
       );
       dispatch(
@@ -80,46 +75,44 @@ const GenAIAnalyticsDashboard = () => {
     }
   };
 
-  // Extract JSON helper function with fallback data
-  const extractJSON = (text: string): ChartDataType[] => {
+  // Helper to extract and normalize JSON data
+  const extractJSON = (text: string) => {
     try {
-      // Remove code block markers and trim
       const cleanText = text.replace(/```(json)?/g, "").trim();
-
-      // Try to parse the clean text
       const parsedData = JSON.parse(cleanText);
-
-      // Validate the parsed data
       if (!Array.isArray(parsedData) || parsedData.length === 0) {
         throw new Error("Invalid data format");
       }
-
-      return parsedData;
+      // Normalize each object: map time period to a unified key "timePeriod"
+      const normalizedData = parsedData.map((item) => {
+        const keys = Object.keys(item);
+        // Find the key that is not "profit" (it could be "year", "months", or "days")
+        const timeKey =
+          keys.find((key) => key.toLowerCase() !== "profit") || "timePeriod";
+        return {
+          timePeriod: item[timeKey],
+          profit: item["profit"] || item["Profit"] || 0,
+        };
+      });
+      return normalizedData;
     } catch (error) {
       console.error("JSON parsing error:", error);
       return [
-        { year: "2022", profit: 500 },
-        { year: "2023", profit: 750 },
-        { year: "2024", profit: 1000 },
+        { timePeriod: "2022", profit: 500 },
+        { timePeriod: "2023", profit: 750 },
+        { timePeriod: "2024", profit: 1000 },
       ];
     }
   };
 
-  // Extract suggestions helper function
-  const extractSuggestions = (text: string): string[] => {
+  // Helper to extract suggestions
+  const extractSuggestions = (text: string) => {
     try {
-      // Remove code block markers and trim
       const cleanText = text.replace(/```(json)?/g, "").trim();
-
-      // Try to parse the clean text
       const parsedSuggestions = JSON.parse(cleanText);
-
-      // Validate the parsed suggestions
       if (!Array.isArray(parsedSuggestions) || parsedSuggestions.length === 0) {
         throw new Error("Invalid suggestions format");
       }
-
-      // Ensure all suggestions are strings
       return parsedSuggestions
         .slice(0, 3)
         .map((suggestion) =>
@@ -133,28 +126,41 @@ const GenAIAnalyticsDashboard = () => {
     }
   };
 
-  // Click handler for suggestion: autofill query and update recommendations
   const handleRecommendationClick = (rec: string) => {
     dispatch(setQuestion(rec));
-    // Trigger AI query when a get analysis is clicked
     handleGeminiQuery(rec);
   };
 
   return (
-    <div className="min-h-screen bg-[#10172a] text-white p-6 flex justify-center items-center">
-      <div className="w-full max-w-4xl">
-        <SearchSection handleGeminiQuery={handleGeminiQuery} />
-
-        <AiSuggestionSection
-          handleRecommendationClick={handleRecommendationClick}
-        />
-
-        <SearchHistorySection
-          handleRecommendationClick={handleRecommendationClick}
-        />
-
-        <ResultSection />
-      </div>
+    <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col">
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto py-6 px-4">
+          <h1 className="text-3xl font-bold text-blue-600 text-center">
+            Data Query Dashboard Prototype
+          </h1>
+        </div>
+      </header>
+      <main className="flex-grow max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6">
+          <SearchSection handleGeminiQuery={handleGeminiQuery} />
+          <AiSuggestionSection
+            handleRecommendationClick={handleRecommendationClick}
+          />
+          <SearchHistorySection
+            handleRecommendationClick={handleRecommendationClick}
+          />
+        </div>
+        <div className="space-y-6">
+          <ResultSection />
+        </div>
+      </main>
+      <footer className="bg-white shadow py-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-sm text-gray-500">
+            &copy; 2025 Data Query Dashboard Prototype. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

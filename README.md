@@ -1,54 +1,58 @@
-# React + TypeScript + Vite
+# GenAI Analytics Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🚀 Overview
 
-Currently, two official plugins are available:
+GenAI Analytics Dashboard is a web application that leverages Google Gemini AI to generate insights and visualize data based on user queries. It provides AI-generated reports, data charts, and smart recommendations for further analysis.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🎯 Features
 
-## Expanding the ESLint configuration
+- 🔎 **AI-Powered Insights**: Generates professional analysis for user queries using Google Gemini AI.
+- 📊 **Data Visualization**: Displays sales/performance trends in an interactive chart.
+- 💡 **AI Recommendations**: Suggests related queries for deeper exploration.
+- 🕵️ **Search History**: Keeps track of recent searches for quick access.
+- ⚡ **Fast & Responsive**: Built with React, Redux, and Tailwind CSS for a smooth user experience.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🏗️ Tech Stack
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **Frontend**: React, Redux Toolkit, TypeScript, Tailwind CSS
+- **AI Integration**: Google Generative AI (Gemini API)
+- **State Management**: Redux Toolkit
+- **Charts**: Recharts
+- **Environment Variables**: Vite for managing API keys
+
+## 🛠️ Installation & Setup
+
+1️⃣ **Clone the Repository**
+
+```sh
+git clone https://github.com/your-username/GenAI-Analytics-Dashboard.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2️⃣ **Install Dependencies**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```sh
+npm install
 ```
+
+3️⃣ **Set Up Environment Variables**
+
+```sh
+Create a .env file in the project root and add:
+
+VITE_GEMINI_API_KEY=your_google_gemini_api_key
+```
+
+4️⃣ **Start the Development Server**
+
+```sh
+npm run dev
+The app will be available at http://localhost:5173/.
+```
+
+🎯 Usage Guide
+1️⃣ Enter a query in the search bar (e.g., "Sales performance of Amazon in 2023").
+2️⃣ Get AI insights and recommendations for related queries.
+3️⃣ View data visualization with charts for better analysis.
+4️⃣ Click on suggestions to explore further insights.
+
+💡 If you like this project, give it a ⭐ on GitHub!

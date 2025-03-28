@@ -12,74 +12,70 @@ import { RootState } from "../types";
 import { useSelector } from "react-redux";
 
 const ResultSection = () => {
+  const { output, chartData, isLoading } = useSelector(
+    (state: RootState) => state.dashboard
+  );
 
-  const {
-    output,
-    chartData,
-    isLoading,
-  } = useSelector((state: RootState) => state.dashboard);
-   
+  // Determine the key for x-axis dynamically
+  const xAxisKey = chartData.length > 0 ? Object.keys(chartData[0])[0] : "year";
+
   return (
-    <>
-    <div className="grid grid-cols-1 gap-6">
-          {/* AI Insights Text */}
-          <div className="bg-[#1e293b] rounded-xl p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold mb-4 text-blue-400">
-              AI Insights
-            </h2>
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
-              </div>
-            ) : (
-              <p className="text-gray-300 leading-relaxed">
-                {output || "Your AI-generated insights will appear here..."}
-              </p>
-            )}
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg shadow p-4">
+        <h2 className="text-xl font-semibold text-blue-600 mb-4">
+          AI Insights
+        </h2>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-40">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-600"></div>
           </div>
+        ) : (
+          <p className="text-gray-700 leading-relaxed">
+            {output || "Your AI-generated insights will appear here..."}
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col items-center bg-white rounded-lg shadow p-4">
+        <h2 className="text-xl font-semibold text-blue-600 mb-4">
+          Data Visualization
+        </h2>
+        <ResponsiveContainer width="95%" height={300} className="my-4">
+          <LineChart
+            margin={{ top: 5, right: 30, left: 50, bottom: 5 }}
+            data={
+              chartData.length > 0
+                ? chartData
+                : [
+                    { months: "Jan", profit: 500 },
+                    { months: "Feb", profit: 750 },
+                    { months: "Mar", profit: 1000 },
+                  ]
+            }
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis dataKey={xAxisKey} stroke="#718096" />
+            <YAxis stroke="#718096" />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#edf2f7",
+                border: "none",
+                borderRadius: "0.5rem",
+              }}
+              itemStyle={{ color: "#2d3748" }}
+              labelStyle={{ color: "#2d3748" }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="profit"
+              stroke="#3182ce"
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
 
-          {/* Chart Visualization */}
-          <div className="bg-[#1e293b] rounded-xl p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold mb-4 text-blue-400">
-              Data Visualization
-            </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={
-                  chartData.length > 0
-                    ? chartData
-                    : [
-                        { year: "2022", profit: 500 },
-                        { year: "2023", profit: 750 },
-                        { year: "2024", profit: 1000 },
-                      ]
-                }
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="year" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                  }}
-                  itemStyle={{ color: "white" }}
-                  labelStyle={{ color: "white" }}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="profit"
-                  stroke="#8b5cf6"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-    </>
-  )
-}
-
-export default ResultSection
+export default ResultSection;
