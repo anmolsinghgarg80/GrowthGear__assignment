@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { BarChart2, Lightbulb } from "lucide-react";
 import { RootState } from "../types";
 import { useSelector } from "react-redux";
 
@@ -16,65 +17,57 @@ const ResultSection = () => {
     (state: RootState) => state.dashboard
   );
 
-  // Determine the key for x-axis dynamically
-  const xAxisKey = chartData.length > 0 ? Object.keys(chartData[0])[0] : "year";
-
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow p-4">
-        <h2 className="text-xl font-semibold text-blue-600 mb-4">
-          AI Insights
-        </h2>
+    <>
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="flex items-center space-x-4 mb-4">
+          <Lightbulb className="text-yellow-500" size={24} />
+          <h2 className="text-xl font-semibold text-gray-800">
+            AI-Powered Insights
+          </h2>
+        </div>
         {isLoading ? (
           <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600"></div>
           </div>
         ) : (
-          <p className="text-gray-700 leading-relaxed">
-            {output || "Your AI-generated insights will appear here..."}
+          <p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">
+            {output || "Your intelligent insights will appear here..."}
           </p>
         )}
       </div>
-      <div className="flex flex-col items-center bg-white rounded-lg shadow p-4">
-        <h2 className="text-xl font-semibold text-blue-600 mb-4">
-          Data Visualization
-        </h2>
-        <ResponsiveContainer width="95%" height={300} className="my-4">
-          <LineChart
-            margin={{ top: 5, right: 30, left: 50, bottom: 5 }}
-            data={
-              chartData.length > 0
-                ? chartData
-                : [
-                    { months: "Jan", profit: 500 },
-                    { months: "Feb", profit: 750 },
-                    { months: "Mar", profit: 1000 },
-                  ]
-            }
-          >
+
+      {/* Chart Section */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="flex items-center space-x-4 mb-4">
+          <BarChart2 className="text-green-600" size={24} />
+          <h2 className="text-xl font-semibold text-gray-800">
+            Data Visualization
+          </h2>
+        </div>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xAxisKey} stroke="#718096" />
+            <XAxis dataKey="timePeriod" stroke="#718096" />
             <YAxis stroke="#718096" />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#edf2f7",
-                border: "none",
-                borderRadius: "0.5rem",
+                backgroundColor: "#f0f4f8",
+                borderRadius: "0.75rem",
               }}
-              itemStyle={{ color: "#2d3748" }}
-              labelStyle={{ color: "#2d3748" }}
             />
             <Legend />
             <Line
               type="monotone"
               dataKey="profit"
               stroke="#3182ce"
-              strokeWidth={2}
+              strokeWidth={3}
+              activeDot={{ r: 8 }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </>
   );
 };
 

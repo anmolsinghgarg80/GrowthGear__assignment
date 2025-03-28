@@ -11,15 +11,18 @@ import {
   setIsLoading,
   setSearchHistory,
 } from "./features/dashboardSlice";
+import { BarChart2 } from "lucide-react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { RootState } from "./types";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const GenAIAnalyticsDashboard = () => {
+
   const { question, searchHistory } = useSelector(
     (state: RootState) => state.dashboard
   );
+
   const dispatch = useDispatch();
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
@@ -28,9 +31,11 @@ const GenAIAnalyticsDashboard = () => {
     const queryToUse = queryOverride || question;
     if (!queryToUse.trim()) return;
     dispatch(setIsLoading(true));
+
     try {
+
       // Generate natural language insights
-      const responsePrompt = `Provide a short 200 words professional analysis for the question: ${queryToUse}`;
+      const responsePrompt = `Provide a short 200 words professional analysis with spaces for the question: ${queryToUse}`;
       const responseResult = await model.generateContent(responsePrompt);
       const textResponse = await responseResult.response.text();
 
@@ -132,14 +137,18 @@ const GenAIAnalyticsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 flex flex-col">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4">
-          <h1 className="text-3xl font-bold text-blue-600 text-center">
-            Data Query Dashboard Prototype
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 text-gray-800">
+      <header className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto py-6 px-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <BarChart2 className="text-blue-600" size={32} />
+            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+              AI Analytics Dashboard
+            </h1>
+          </div>
         </div>
       </header>
+
       <main className="flex-grow max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6">
           <SearchSection handleGeminiQuery={handleGeminiQuery} />
@@ -154,7 +163,7 @@ const GenAIAnalyticsDashboard = () => {
           <ResultSection />
         </div>
       </main>
-      <footer className="bg-white shadow py-4">
+      <footer className="bg-white shadow py-4 bottom-0">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-sm text-gray-500">
             &copy; 2025 Data Query Dashboard Prototype. All rights reserved.
